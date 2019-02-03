@@ -4,6 +4,7 @@
 #include <list>
 #include <assert.h>
 #include "kalloc.h"
+#include "kcont.h"
 #include "version.h"
 
 unsigned int fact(unsigned int n) {

@@ -23,7 +23,7 @@ before_script:
 
 script:
  - CXX=/usr/bin/g++-7 CC=/usr/bin/gcc-7 cmake .
- - sudo . ./pname.sh
+ - . ./pname.sh
  - echo "Project name:"
  - echo $TRAVIS_PROJECT_NAME
  - cmake --build .
