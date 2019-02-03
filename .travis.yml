@@ -26,7 +26,9 @@ script:
 - cmake --build .
 - cmake --build . --target test
 - cmake --build . --target package
-- . ./pname.sh
+- sudo . ./pname.sh
+- echo "Project name:"
+- echo $TRAVIS_PROJECT_NAME
 
 deploy:
   provider: script
