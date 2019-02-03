@@ -24,6 +24,11 @@ int main(int argc, char **argv)
   
   for (int i=0; i<10; i++) m[i] = fact(i);
   for (int i=0; i<10; i++) std::cout << i << " " << m[i] << std::endl;
+  
+  auto k = kCont<int, kalloc<int, 10>>{};
+  for (int i=0; i<10; i++) k.add(i);
+  k.begin();
+  for (int i=0; i<10; i++) std::cout << k.next() << std::endl;
 
   //std::cout << "M1" << std::endl;
   return 0;
