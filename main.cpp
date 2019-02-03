@@ -20,15 +20,22 @@ int main(int argc, char **argv)
 
   std::cout << "Version 0.0." << PROJECT_VERSION_PATCH << std::endl;
   
-  auto m = std::map<int, int, std::less<int>, kalloc<std::pair<const int, int>, 10>>{};
-  
+  auto m = std::map<int, int>{};
   for (int i=0; i<10; i++) m[i] = fact(i);
-  for (int i=0; i<10; i++) std::cout << i << " " << m[i] << std::endl;
+
+  auto nm = std::map<int, int, std::less<int>, kalloc<std::pair<const int, int>, 10>>{};
+  for (int i=0; i<10; i++) nm[i] = fact(i);
+
+  for (int i=0; i<10; i++) std::cout << i << " " << nm[i] << std::endl;
   
-  auto k = kCont<int, kalloc<int, 10>>{};
+  auto k = kCont<int>{};
   for (int i=0; i<10; i++) k.add(i);
-  k.begin();
-  for (int i=0; i<10; i++) std::cout << k.next() << std::endl;
+
+  auto nk = kCont<int, kalloc<int, 10>>{};
+  for (int i=0; i<10; i++) nk.add(i);
+
+  nk.begin();
+  for (int i=0; i<10; i++) std::cout << nk.next() << std::endl;
 
   //std::cout << "M1" << std::endl;
   return 0;

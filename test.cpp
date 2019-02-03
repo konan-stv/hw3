@@ -1,5 +1,6 @@
 #include <string>
 #include "kalloc.h"
+#include "kcont.h"
 #include <gtest/gtest.h>
 
 kChunk *ch;
@@ -37,6 +38,17 @@ TEST(hwTest, TESTkcShuffle) {
   EXPECT_EQ(ch->getfree(), a+1);
   b[6] = ch->allocate(1);
   EXPECT_EQ(ch->getfree(), a);
+}
+
+TEST(hwTest, TESTkCont) {
+  auto k = kCont<int>{};
+  k.add(1);
+  k.add(11);
+  k.add(32767);
+  k.begin();
+  EXPECT_EQ(k.next(), 1);
+  EXPECT_EQ(k.next(), 11);
+  EXPECT_EQ(k.next(), 32767);
 }
 
 int main(int argc, char **argv) {
