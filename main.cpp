@@ -13,7 +13,7 @@ struct kChunk {
 
   kChunk(std::size_t bs, uint8_t bc);
   ~kChunk();
-  void* allocate(std::size_t n);
+  void *allocate(std::size_t n);
   bool deallocate(void *p);
   unsigned int getfree() {return bfree;}
 };
@@ -39,12 +39,12 @@ kChunk::~kChunk() {
   printf("KF free %d favail %d\r\n", bfree, favail);
 }
 
-void* kChunk::allocate(std::size_t n) {
+void *kChunk::allocate(std::size_t n) {
   if (!bfree) {
     printf("Full\r\n");
     return nullptr;
   }
-  uint8_t* p = chunk + (favail * bsize);
+  uint8_t *p = chunk + (favail * bsize);
   favail = *p;
   bfree--;
 //  std::cout << "KA free " << bfree << " favail " << favail << std::endl;
@@ -53,7 +53,7 @@ void* kChunk::allocate(std::size_t n) {
 }
 
 bool kChunk::deallocate(void *p) {
-  uint8_t* tr = (static_cast<uint8_t*>(p))-1;
+  uint8_t *tr = (static_cast<uint8_t*>(p))-1;
   if (tr < chunk) return 0;    // not this chunk
   if (tr > (chunk+bsize*bcount)) return 0;    // not this chunk
   assert(((tr-chunk)%bsize) == 0); // bounds check 
@@ -75,6 +75,7 @@ struct kalloc {
   using reference = T&;
   using const_reference = const T&;
   
+  kChunk *lastA, *lastD;   // cache - last allocated and last deallocated
   std::list<kChunk> chunks;
 
   template<typename U>
@@ -82,34 +83,50 @@ struct kalloc {
     using other = kalloc<U, chsize>;
   };
 
-  kalloc() {}
+  kalloc() {lastA = lastD = nullptr;}
   ~kalloc() {}
 
   template<typename U, unsigned int a> 
   kalloc(const kalloc<U, a>) {}
 
   T *allocate(std::size_t n) {
-    //auto p = std::malloc(n * sizeof(T));
     if (!chunks.size()) {
       chunks.emplace_back(sizeof(T), chsize);
+      lastA = &chunks.back();
       std::cout << "C1" << std::endl;
+    } else {
+      lastA = nullptr;
+      if (lastD) {    // check last deallocated
+        if (lastD->getfree())
+          lastA = lastD;
+      }
+      if (!lastA) {   // then check existing chunks
+        for (auto i=chunks.rbegin(); i!=chunks.rend(); i++) 
+          if (i->getfree()) {
+            lastA = &(*i);    // god bless c++ 
+            break;
+          }
+      }
+      if (!lastA) {   // create new chank
+        chunks.emplace_back(sizeof(T), chsize);
+        lastA = &chunks.back();
+        std::cout << "C" << std::endl;
+      }
     }
     
-    std::cout << chunks.back().getfree() << std::endl;
-    
-    if (!chunks.back().getfree()) {
-      chunks.emplace_back(sizeof(T), chsize);
-      std::cout << "C" << std::endl;
-    }
-    
-    return reinterpret_cast<T *>(chunks.back().allocate(n));
+    return reinterpret_cast<T *>(lastA->allocate(n));
   }
 
   void deallocate(T *p, std::size_t n) {
     assert(chunks.size() != 0);
     std::cout << "A2: " << chsize << std::endl;
-    for (auto i=chunks.begin(); i!=chunks.end(); i++) 
-      if (i->deallocate(p)) return;
+    if (!lastA->deallocate(p)) {
+      for (auto i=chunks.begin(); i!=chunks.end(); i++) 
+        if (i->deallocate(p)) {
+          lastD = &(*i);
+          return;
+        }
+    } else lastD = lastA;
   }
 
   template<typename U, typename ...Args>
