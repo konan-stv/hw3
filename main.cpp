@@ -6,6 +6,12 @@
 #include "kalloc.h"
 #include "version.h"
 
+unsigned int fact(unsigned int n) {
+  if (n == 0) return 0;
+  if (n == 1) return 1;
+  else return n*fact(n-1);
+}
+
 int main(int argc, char **argv)
 {
   (void)argc;
@@ -13,12 +19,11 @@ int main(int argc, char **argv)
 
   std::cout << "Version 0.0." << PROJECT_VERSION_PATCH << std::endl;
   
-  auto m = std::map<int, int, std::less<int>, kalloc<std::pair<const int, int>, 5>>{};
+  auto m = std::map<int, int, std::less<int>, kalloc<std::pair<const int, int>, 10>>{};
   
-  for (uint8_t i=1; i<14; i++) m[i] = i*10;
-  for (int i=1; i<14; i+=2) m.erase(i);
-  for (uint8_t i=1; i<14; i++) m[i+20] = i*10;
+  for (int i=0; i<10; i++) m[i] = fact(i);
+  for (int i=0; i<10; i++) std::cout << i << " " << m[i] << std::endl;
 
-  std::cout << "M1" << std::endl;
+  //std::cout << "M1" << std::endl;
   return 0;
 }
