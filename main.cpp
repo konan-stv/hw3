@@ -8,6 +8,9 @@
 
 int main(int argc, char **argv)
 {
+  (void)argc;
+  (void)argv;
+
   std::cout << "Version 0.0." << PROJECT_VERSION_PATCH << std::endl;
   
   auto m = std::map<int, int, std::less<int>, kalloc<std::pair<const int, int>, 5>>{};

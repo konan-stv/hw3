@@ -61,15 +61,16 @@ struct kalloc {
     if (!lastA) {   // create new chunk
       chunks.emplace_back(sizeof(T), chsize);
       lastA = &chunks.back();
-      std::cout << "C" << std::endl;
+      //std::cout << "C" << std::endl;
     }
     
     return reinterpret_cast<T *>(lastA->allocate(n));
   }
 
   void deallocate(T *p, std::size_t n) {
+    (void)n;
     assert(chunks.size() != 0);
-    std::cout << "A2: " << chsize << std::endl;
+    //std::cout << "A2: " << chsize << std::endl;
     if (!lastA->deallocate(p)) {
       for (auto i=chunks.rbegin(); i!=chunks.rend(); i++) 
         if (i->deallocate(p)) {
@@ -82,12 +83,12 @@ struct kalloc {
   template<typename U, typename ...Args>
   void construct(U *p, Args &&...args) {
     new(p) U(std::forward<Args>(args)...);
-    std::cout << "A3: " << chsize << std::endl;
+    //std::cout << "A3: " << chsize << std::endl;
   }
 
   void destroy(T *p) {
     p->~T();
-    std::cout << "A4: " << chsize << std::endl;
+    //std::cout << "A4: " << chsize << std::endl;
   }
 };
 
