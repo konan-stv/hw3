@@ -11,11 +11,10 @@ addons:
    - g++-7
 
 before_script:
-- sudo apt-get install libboost-all-dev -y
+#- sudo apt-get install libboost-all-dev -y
 - sudo apt-get install libgtest-dev -y
 - cd /usr/src/gtest
 - sudo env "PATH=$PATH" cmake .
-#- sudo env "PATH=$PATH" cmake --build . --target install
 - sudo make
 - sudo cp *.a /usr/lib
 - echo "deb http://archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
@@ -27,9 +26,10 @@ script:
 - cmake --build .
 - cmake --build . --target test
 - cmake --build . --target package
+- . ./pname.sh
 
 deploy:
   provider: script
   skip_cleanup: true
   script:
-  - curl -T calloc-0.0.1-Linux.deb -ukonan-stv:$BINTRAY_API_KEY "https://api.bintray.com/content/konan-stv/otus_hw/calloc/1/calloc-0.0.1-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
+  - curl -T $TRAVIS_PROJECT_NAME-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ukonan-stv:$BINTRAY_API_KEY "https://api.bintray.com/content/konan-stv/otus_hw/$TRAVIS_PROJECT_NAME/1/calloc-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"

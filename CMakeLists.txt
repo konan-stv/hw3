@@ -1,18 +1,25 @@
 cmake_minimum_required(VERSION 3.6)
 
 ## Custom Allocator
-set( PROJECT_NAME "calloc" )
+set (PROJECT_NAME "calloc")
 
 ## Set our project name
-project(${PROJECT_NAME} CXX)
+project (${PROJECT_NAME} CXX)
+
+set (ENV{TRAVIS_PROJECT_NAME} "${PROJECT_NAME}")
+set(file_sh ${CMAKE_CURRENT_BINARY_DIR}/pname.sh)
+file(WRITE ${file_sh} "#!/usr/bin/env bash\n")
+file(APPEND ${file_sh} "export TRAVIS_PROJECT_NAME=\"${PROJECT_NAME}\"")
+execute_process(COMMAND chmod a+x ${file_sh} RESULT_VARIABLE res)
+#execute_process(COMMAND . ./${file_sh} RESULT_VARIABLE res)
 
 set (GTEST_ROOT /usr/src/gtest)
 set (GTEST_LIBRARY /usr/src/gtest/libgtest.a)
 set (GTEST_MAIN_LIBRARY /usr/src/gtest/libgtest_main.a)
 
-find_package(GTest REQUIRED)
-find_package(Threads REQUIRED)
-include_directories(${GTEST_INCLUDE_DIR})
+find_package (GTest REQUIRED)
+find_package (Threads REQUIRED)
+include_directories (${GTEST_INCLUDE_DIR})
 
 if(DEFINED ENV{TRAVIS_BUILD_NUMBER})
   project(${PROJECT_NAME} VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
@@ -49,6 +56,10 @@ set_target_properties(${PROJECT_NAME} runTest PROPERTIES
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
+
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 
 set(CPACK_PACKAGE_CONTACT konan@konanlabs.ru)
 
